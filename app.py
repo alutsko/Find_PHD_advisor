@@ -33,8 +33,7 @@ first_card = dbc.Card(dbc.CardBody(
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[default_uni])])]),
         html.Br(),
-            
-        # dash_table.DataTable(res.to_dict('records'), id='table'),
+        
         dcc.Graph(id = 'pie', figure = px.pie(default_df, values='Keyword Count', names='Keyword', title='Top 10 Keywords by Count', hole=0.25))
                 
     ])
@@ -48,7 +47,8 @@ def create_faculty_cards(faculty_df):
                     dbc.Col([dbc.Row([
                             dbc.Col([html.Div("Rank #" + str(index+1)),
                                      html.Div("Name: " + str(faculty_df['fac.name'][index])),
-                                     html.Div("Institution: " + str(faculty_df['uni.name'][index]))]), 
+                                     html.Div("Institution: " + str(faculty_df['uni.name'][index])),
+                                     html.Div("Number papers with keyword: " + str(faculty_df['COUNT(pub)'][index]))]), 
                             dbc.Col([html.Img(src=faculty_df['fac.photoUrl'][index], style= {"height": "200px", "width": "150px"})]), 
                             dbc.Col([
                                     html.Div("Position: " + str(faculty_df['fac.position'][index])), 
