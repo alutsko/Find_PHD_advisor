@@ -14,7 +14,7 @@ default_uni = 'university of illinois at urbana champaign'
 default_df = mysql_utils.make_query(default_uni)
 
 default_keyword = "machine learning"
-default_neo4j = neo4j_utils.query_neo4j(default_keyword)
+default_neo4j = neo4j_utils.neo4j_faculty_keywords(default_keyword)
 
 
 # Initialize the app - incorporate a Dash Mantine theme
@@ -78,10 +78,51 @@ second_card = dbc.Card(dbc.CardBody(
     ])
 )
 
+def faculty_search_results(faculty_df):
+    card_list = []
+    return_card = dbc.Card(style={'overflowX': 'scroll'})
+    for index in faculty_df.index:
+        card = dbc.Card(
+                dbc.CardBody(
+                    dbc.Col([dbc.Row([
+                            dbc.Col([html.Div("Rank #" + str(index+1)),
+                                     html.Div("Name: " + str(faculty_df['fac.name'][index])),
+                                     html.Div("Institution: " + str(faculty_df['uni.name'][index]))]), 
+                            dbc.Col([html.Img(src=faculty_df['fac.photoUrl'][index], style= {"height": "200px", "width": "150px"})]), 
+                            dbc.Col([
+                                    html.Div("Position: " + str(faculty_df['fac.position'][index])), 
+                                    html.Div("Email: " + str(faculty_df['fac.email'][index])), 
+                                    html.Div("Phone: " + str(faculty_df['fac.phone'][index])),
+                                    html.Img(src=faculty_df['uni.photoUrl'][index], style={"height": "100px", "width": "100px"})])
+                            ])])
+                )
+        )
+        card_list.append(card)
+    return_card.children = card_list
+    return return_card
+
+third_card = dbc.Card(dbc.CardBody(
+    [
+        dmc.Title('Fix Missing Faculty Fields'),
+        html.Br(),
+
+        dcc.Input(id='faculty-name-search', type='search', placeholder='Search Faculty Name...', debounce=True),
+        html.Br(),
+        html.Hr(),
+        dbc.Row([dbc.Col(children = html.Div("Faculty Search Results: "))]),
+        html.Br(),
+        dash_table.DataTable(id='table', data=pd.DataFrame().to_dict('records')),
+        dbc.Alert(id='tbl_out')
+        # dbc.Col(id = 'faculty-fix', children = dbc.Card())
+                 
+    ])
+)
+
 app.layout = dbc.Row(
     [
         dbc.Col(first_card),
-        dbc.Col(second_card)
+        dbc.Col(second_card),
+        dbc.Col(third_card)
     ]
 )
 
@@ -125,8 +166,26 @@ def display_search(value):
     prevent_initial_call = True
 )
 def update_output(value):
-   
-    return create_faculty_cards(neo4j_utils.query_neo4j(value))
+    return create_faculty_cards(neo4j_utils.neo4j_faculty_keywords(value))
+
+# Widget 3
+results = pd.DataFrame()
+@app.callback(
+    Output('table', 'data'),
+    [Input('faculty-name-search', 'value')],
+    prevent_initial_call = True
+)
+def update_output(value):
+    results = neo4j_utils.neo4j_find_faculty(value)
+    return results[['Name', 'Institution', 'Position', 'Email', 'Phone', 'PhotoURL']].to_dict('records')
+
+@app.callback(
+    Output('tbl_out', 'children'),
+    [Input('table', 'active_cell')],
+    prevent_initial_call = True
+)
+def update_graphs(active_cell):
+    return str(active_cell) if active_cell else "Click the table"
 
 # Run the App
 if __name__ == '__main__':
