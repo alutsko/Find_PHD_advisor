@@ -20,7 +20,7 @@ def neo4j_find_faculty(name):
     driver =  GraphDatabase.driver(URI, auth=AUTH)
 
     neo4j_query_res = driver.execute_query(
-        "MATCH (fac:FACULTY WHERE fac.name CONTAINS \"" + name +"\")-[]->(uni:INSTITUTE) RETURN fac.id as fac_id, fac.name AS Name, uni.name AS Institution, fac.position AS Position, fac.email AS Email, fac.phone AS Phone, fac.photoUrl as PhotoURL",
+        "MATCH (fac:FACULTY WHERE toLower(fac.name) CONTAINS \"" + name.lower() +"\")-[]->(uni:INSTITUTE) RETURN fac.id as fac_id, fac.name AS Name, uni.name AS Institution, fac.position AS Position, fac.email AS Email, fac.phone AS Phone, fac.photoUrl as PhotoURL",
         database_="academicworld", 
         result_transformer_= neo4j.Result.to_df
         )

@@ -1,5 +1,5 @@
 # Import packages
-from dash import Dash, html, dash_table, dcc, callback, Output, Input, State
+from dash import Dash, html, dash_table, dcc, ctx, Output, Input, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
 import plotly.express as px
@@ -25,13 +25,12 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 # App layout
-
 first_card = dbc.Card(dbc.CardBody(
     [
         dmc.Title('Find University Top Keywords'),
         html.Br(),
 
-        dcc.Input(id='uni-search', type='search', placeholder='Search Universities...', debounce=True),
+        dbc.Row([dbc.Col(dcc.Input(id='uni_search', type='search', placeholder='Search Universities...', debounce=True)), dbc.Col(html.Button('Search', id='submit_uni_search', n_clicks=0))]),
         html.Br(),
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[default_uni])])]),
@@ -70,13 +69,12 @@ second_card = dbc.Card(dbc.CardBody(
     [
         dmc.Title('Find Faculty Best Keywords'),
         html.Br(),
-
-        dcc.Input(id='keyword-search', type='search', placeholder='Search Keywords...', debounce=True),
+        dbc.Row([dbc.Col(dcc.Input(id='keyword_search', type='search', placeholder='Search Keywords...', debounce=True)), dbc.Col(html.Button('Search', id='submit_kw_search', n_clicks=0))]),
         html.Br(),
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top faculty for: ")]), dbc.Col(children = [html.Div(id="display_keyword", children=[default_keyword])])]),
         html.Br(),
-        dbc.Col(id = 'faculty-col', children = create_faculty_cards(default_neo4j))
+        dbc.Col(id = 'faculty_col', children = create_faculty_cards(default_neo4j))
                  
     ])
 )
@@ -86,15 +84,16 @@ third_card = dbc.Card(dbc.CardBody(
     [
         dmc.Title('Fix Missing Faculty Fields'),
         html.Br(),
-
-        dcc.Input(id='faculty-name-search', type='search', placeholder='Search Faculty Name...', debounce=True),
+        dbc.Row([dbc.Col(dcc.Input(id='faculty_name_search', type='search', placeholder='Search Faculty Name...', debounce=True)), dbc.Col(html.Button('Search', id='submit_facname_search', n_clicks=0))]),
         html.Br(),
         html.Hr(),
         dbc.Row([dbc.Col(children = html.Div("Faculty Search Results: "))]),
         html.Br(),
-        dash_table.DataTable(id='table', data= default_missing_fac_fields, columns= default_missing_columns),
+        dash_table.DataTable(  
+            id='table', data= default_missing_fac_fields, columns= default_missing_columns,
+            style_table={'overflowX': 'auto'}),
         html.Br(),
-        dcc.Input(id='data_update', type='text', placeholder='Input Data Fix...', debounce=True),
+        dbc.Row([dbc.Col(dcc.Input(id='data_update', type='text', placeholder='Input Data Fix...', debounce=True)), dbc.Col(html.Button('Submit', id='submit_facfix', n_clicks=0))]),
         html.Br(),
         html.Hr(),
         dbc.Alert(id='tbl_out')
@@ -113,66 +112,101 @@ app.layout = dbc.Row(
 # Widget 1
 @app.callback(
     Output('display_uni', 'children'),
-    [Input('uni-search', 'value')],
+    Input('submit_uni_search', 'n_clicks'),
+    State('uni_search', 'value'),
     prevent_initial_call = True
 )
-def display_search(value):
-    if mysql_utils.make_query(value).empty:
-        return 'no results found for '+ f'{value.lower()}'
-    else:   
-        return f'{value.lower()}'
+def display_institution_search(n_clicks, value):
+    if n_clicks > 0:
+        if value == "":
+            raise PreventUpdate
+        elif mysql_utils.make_query(value).empty:
+            return 'no results found for '+ f'{value.lower()}'
+        else:   
+            return f'{value.lower()}'
 
 @app.callback(
     Output('pie', 'figure'),
-    [Input('uni-search', 'value')],
+    Input('submit_uni_search', 'n_clicks'),
+    [State('uni_search', 'value')],
     prevent_initial_call = True
 )
-def update_output(value):
-    res = mysql_utils.make_query(value)
-
-    if not res.empty:
-        return px.pie(res, values=res['Keyword Relevance'], names=res['Keyword'], hole=0.25)
-    else:
-        return px.pie(res, values = pd.Series(dtype='object'), names = pd.Series(dtype='object'), hole=0.25)
+def update_relevance_piechart(n_clicks, value):
+    if n_clicks > 0:
+        res = mysql_utils.make_query(value)
+        if value == "":
+            raise PreventUpdate
+        elif not res.empty:
+            return px.pie(res, values=res['Keyword Relevance'], names=res['Keyword'], hole=0.25)
+        else:
+            return px.pie(res, values = pd.Series(dtype='object'), names = pd.Series(dtype='object'), hole=0.25)
 
 
 # Widget 2
 @app.callback(
     Output('display_keyword', 'children'),
-    [Input('keyword-search', 'value')],
+    Input('submit_kw_search', 'n_clicks'),
+    [State('keyword_search', 'value')],
     prevent_initial_call = True
 )
-def display_search(value):
-    return f'{value.lower()}'
+def display_keyword_search(n_clicks, value):
+    if n_clicks > 0:
+        if value == "":
+            raise PreventUpdate
+        elif neo4j_utils.neo4j_faculty_keywords(value).empty:
+            return 'no results found for '+ f'{value.lower()}'
+        else:
+            return f'{value.lower()}'
+
 @app.callback(
-    Output('faculty-col', 'children'),
-    [Input('keyword-search', 'value')],
+    Output('faculty_col', 'children'),
+    Input('submit_kw_search', 'n_clicks'),
+    [State('keyword_search', 'value')],
     prevent_initial_call = True
 )
-def update_output(value):
-    return create_faculty_cards(neo4j_utils.neo4j_faculty_keywords(value))
+def update_faculty_output(n_clicks, value):
+    if n_clicks > 0:
+        return create_faculty_cards(neo4j_utils.neo4j_faculty_keywords(value))
 
 # Widget 3
 @app.callback(
-    [Output('table', 'data'),
-     Output('table', 'columns')],
-    [Input('faculty-name-search', 'value')],
-    prevent_initial_call = True
-)
-def update_output(value):
-    results = neo4j_utils.neo4j_find_faculty(value)
-    res_dict = results[['fac_id', 'Name', 'Institution', 'Position', 'Email', 'Phone', 'PhotoURL']].to_dict('records')
-    columns = [{"id": i, "name": i} for i in display_columns]
-    return [res_dict, columns]
-
-@app.callback(
+    Output('table', 'data'),
+    Output('table', 'columns'),
     Output('tbl_out', 'children'),
-     Input('data_update', 'value'),
-     State('table', 'active_cell'),
-     State('table', 'data'),
+
+    Input('submit_facname_search', 'n_clicks'),
+    Input('submit_facfix', 'n_clicks'),
+
+    State('faculty_name_search', 'value'),
+    State('data_update', 'value'),
+    State('table', 'active_cell'),
+    State('table', 'data'),
+    
+
     prevent_initial_call = True
 )
-def update_graphs(value, active_cell, data):
+def update_faculty_table(search_fac, submit_fac, fac_name_value, update_fix, active_cell, table_data):
+    triggered_id = ctx.triggered_id
+
+    if triggered_id == 'submit_facname_search':
+        return update_faculty_table(search_fac, fac_name_value)
+    elif triggered_id == 'submit_facfix':
+        return update_fac_field(submit_fac, update_fix, active_cell, fac_name_value, table_data)
+   
+
+def update_faculty_table(n_clicks, value):
+    if n_clicks > 0:
+        results = neo4j_utils.neo4j_find_faculty(value)
+    
+        if value == "" or results.empty:
+            raise PreventUpdate
+        else:
+            res_dict = results[['fac_id', 'Name', 'Institution', 'Position', 'Email', 'Phone', 'PhotoURL']].to_dict('records')
+            columns = [{"id": i, "name": i} for i in display_columns]
+            return [res_dict, columns, '']
+
+
+def update_fac_field(n_clicks, value, active_cell, fac_name_value, data):
     column_name_dict = {
         "Name": "name",
         "Institution": "institution",
@@ -182,12 +216,18 @@ def update_graphs(value, active_cell, data):
         "PhotoURL": "photoUrl"
     }
     database_df = pd.DataFrame(data)
+    
+    if n_clicks > 0:
+        if value == None or value == "":
+            raise PreventUpdate
+        else:
+            neo4j_utils.update_faculty_field(database_df.at[active_cell['row'], 'fac_id'], column_name_dict[active_cell['column_id']], value)
+            results = neo4j_utils.neo4j_find_faculty(fac_name_value)
+            res_dict = results[['fac_id', 'Name', 'Institution', 'Position', 'Email', 'Phone', 'PhotoURL']].to_dict('records')
+            columns = [{"id": i, "name": i} for i in display_columns]
+            update_message = "***Updated " + str(column_name_dict[active_cell['column_id']]) + " with " + str(value) +  "***"
 
-    if value == None or value == "":
-        raise PreventUpdate
-    else:
-        neo4j_utils.update_faculty_field(database_df.at[active_cell['row'], 'fac_id'], column_name_dict[active_cell['column_id']], value)
-        return "***Updated " + str(column_name_dict[active_cell['column_id']]) + " with " + str(value) +  "***"
+            return [res_dict, columns, update_message]
 
 # Run the App
 if __name__ == '__main__':
