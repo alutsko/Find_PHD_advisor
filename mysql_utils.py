@@ -1,12 +1,17 @@
 import mysql.connector
 import pandas as pd
 
-# returns resulting dataframe from a query with given university name
-def make_query(uni):
-
+# connect to sql db
+def connect_to_sql():
     cnx = mysql.connector.connect(user='root', password='test_root',
-                                host='127.0.0.1',
-                                database='academicworld')
+                            host='127.0.0.1',
+                            database='academicworld')
+    return cnx
+
+# returns resulting dataframe from a query with given university name
+def mysql_keyword_relevance(uni):
+
+    cnx = connect_to_sql()
     cursor = cnx.cursor()
 
     query =("SELECT name, keyword_count, score_sum, keyword_count*score_sum AS keyword_relevance " +\
@@ -32,3 +37,22 @@ def make_query(uni):
         empty = pd.DataFrame()
         return empty
 
+
+# get dropdown options
+def fetch_dropdown_options(table_name, label_column, value_column):
+    conn = connect_to_sql()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT DISTINCT {label_column}, {value_column} FROM {table_name} ORDER BY {label_column} ASC")
+    options = [{'label': row[0], 'value': row[1]} for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return options
+
+def GetPublicationsByKeywordAndUniversity(keyword_id, university_id):
+    conn = connect_to_sql()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute( "CALL GetPublicationsByKeywordAndUniversity(%s, %s)" % (keyword_id, university_id))
+    res = pd.DataFrame(cursor)
+    cursor.close()
+    conn.close()
+    return res

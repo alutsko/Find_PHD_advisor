@@ -1,0 +1,34 @@
+.app-div {
+    font-size: 13px;
+}
+
+.bold-text {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.normal-text {
+    display: inline-block;
+    font-weight: normal;
+    margin: 3px;
+}
+
+.input-button-parent {
+    text-align: left;
+}
+
+.input-button-child {
+    display: inline-block;
+    margin: 3px;
+}
+
+.faculty-pic {
+    object-fit: 'cover'; 
+    width: 70%; /* you can use % */
+    height: auto;
+}
+
+.uni-logo {
+    width: 70%; /* you can use % */
+    height: auto;
+}

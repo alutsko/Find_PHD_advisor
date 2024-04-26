@@ -8,7 +8,10 @@ the students are interested in have lots of works in
 
 **Demo:** //TODO: Give the link to your video demo.
 
-**Installation:** N/A - only used the given dataset.
+**Installation:** Please run the following MySQL commands in the academic world database:
+
+1. Run the contents in the provided FacultyUniversityView.sql file - this will create a view later referenced
+2. Run the contents in the provided GetPublicationsByKeywordAndUniversity.sql file - this will create a stored procedure referencing the aforementioned view
 
 **Usage by widget:**
 
@@ -36,7 +39,7 @@ the students are interested in have lots of works in
 
 **Implementation:** We implemented these widgets using Dash and supporting dash component libaries such as _Dash Mantine Components_, _Dash Core Components_, and _Dash Bootstrap Components_, etc. We also used pandas dataframes to store retrieved data from the databases. The _Dash Bootstrap Components_ were especially helpful in providing Cards that cleanly segemented each widget into logical partitions.
 
-**Database Techniques:** Techniques we implemented included indexing in both MySQL and Neo4j, where we created indexes for specific fields we access the most often (aside from table ids that are already indexed by being PRIMARY KEYs). We also implemented triggers and exceptions. (//TODO: Explain how?)
+**Database Techniques:** Techniques we implemented included indexing in both MySQL and Neo4j, where we created indexes for specific fields we access the most often (aside from table ids that are already indexed by being PRIMARY KEYs). We also implemented views and stored procedures. (//TODO: Explain how?)
 
 **Extra-Credit Capabilities:** Fix Missing Faculty Fields Widget offers quick and easy data cleaning by giving users the ability to fill in missing faculty information or fix erroneous data - the multiple input fields and extra data table update after fixing data had to be implemented with extra effort since Dash DataTables currently do not support inline editing of tables with strings (although they do with numbers - we had to learn through bug forums) and handling updating the same output with multiple inputs through advanced callbacks with dash.callback_context.
 
@@ -47,7 +50,7 @@ Helen:
    Widgets - Find University Top Keywords, Find Faculty Best Keywords, Fix Missing Faculty Fields
    Techniques - Indexing
    Databases used - MySQL and Neo4j
-   Misc. - created repository, project outline/plan, widget brainstorming, wrote out README file
+   Misc. - project outline/plan, widget brainstorming, README file, widget integration
 
 2. Estimated time spent: 30 hours
 
@@ -55,7 +58,7 @@ Amber:
 
 1. Tasks done:
    Widgets - Add New Faculty Members, Top Publications in Research Interest, Trending Keywords by Institution
-   Techniques - Triggers, Exceptions
+   Techniques - Views, Stored Procedures
    Databases used - MySQL and MongoDB
    Misc. - project outline/plan population, widget brainstorming
 

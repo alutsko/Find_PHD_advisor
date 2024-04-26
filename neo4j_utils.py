@@ -2,10 +2,14 @@ from neo4j import GraphDatabase
 import neo4j
 from PIL import Image
 
-def neo4j_faculty_keywords(keyword):
+def connect_to_neo4j():
     URI = "bolt://localhost:7687"
     AUTH = ("neo4j", "ilovecs411")
     driver =  GraphDatabase.driver(URI, auth=AUTH)
+    return driver
+
+def neo4j_faculty_keywords(keyword):
+    driver =  connect_to_neo4j()
 
     neo4j_query_res = driver.execute_query(
         "MATCH (uni:INSTITUTE)<-[:AFFILIATION_WITH]-(fac:FACULTY)-[:PUBLISH]->(pub:PUBLICATION)-[:LABEL_BY]->(keyword:KEYWORD WHERE keyword.name = \"" + keyword +"\") RETURN fac.id as fac_id, fac.name as Name, fac.photoUrl as PhotoURL, fac.position as Position, fac.researchInterest, fac.phone as Phone, fac.email as Email, uni.name as Institution, uni.photoUrl, COUNT(pub) as pub_count ORDER BY COUNT(pub) DESC LIMIT 5",
@@ -15,9 +19,7 @@ def neo4j_faculty_keywords(keyword):
     return neo4j_query_res
 
 def neo4j_find_faculty(name):
-    URI = "bolt://localhost:7687"
-    AUTH = ("neo4j", "ilovecs411")
-    driver =  GraphDatabase.driver(URI, auth=AUTH)
+    driver =  connect_to_neo4j()
 
     neo4j_query_res = driver.execute_query(
         "MATCH (fac:FACULTY WHERE toLower(fac.name) CONTAINS \"" + name.lower() +"\")-[]->(uni:INSTITUTE) RETURN fac.id as fac_id, fac.name AS Name, uni.name AS Institution, fac.position AS Position, fac.email AS Email, fac.phone AS Phone, fac.photoUrl as PhotoURL",
@@ -26,10 +28,8 @@ def neo4j_find_faculty(name):
         )
     return neo4j_query_res
 
-def update_faculty_field(fac_id, field, data):
-    URI = "bolt://localhost:7687"
-    AUTH = ("neo4j", "ilovecs411")
-    driver =  GraphDatabase.driver(URI, auth=AUTH)
+def neo4j_update_faculty_field(fac_id, field, data):
+    driver =  connect_to_neo4j()
 
     query = "MATCH (fac:FACULTY WHERE fac.id = '" + fac_id + "') SET fac." + field + " = '"+ data +"' RETURN fac"
     neo4j_query_res = driver.execute_query(
