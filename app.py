@@ -46,10 +46,6 @@ first_card = dbc.Card(dbc.CardBody(
         ),
         html.Br(),
         html.Button('Submit', id='submit_uni_search', n_clicks=0),
-
-        # html.Div(className = 'input-button-parent', 
-        #          children=[html.Div(className = 'input-button-child', children = dcc.Input(id='uni_search', type='search', placeholder='Search Universities...', debounce=True)), 
-        #                    html.Div(className = 'input-button-child', children =  html.Button('Search', id='submit_uni_search', n_clicks=0))]),
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[mysql_utils.mysql_get_uni_from_id(default_uni)])])]),
         
@@ -100,9 +96,6 @@ second_card = dbc.Card(dbc.CardBody(
         ),
         html.Br(),
         html.Button('Submit', id='submit_kw_search', n_clicks=0),
-        # html.Div(className = 'input-button-parent',
-        #          children = [html.Div(className = 'input-button-child', children = dcc.Input(id='keyword_search', type='search', placeholder='Search Keywords...', debounce=True)), 
-        #                    html.Div(className = 'input-button-child', children =html.Button('Search', id='submit_kw_search', n_clicks=0))]),
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top faculty for: ")]), dbc.Col(children = [html.Div(id="display_keyword", children=[default_keyword])])]),
         html.Br(),
