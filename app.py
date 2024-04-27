@@ -49,7 +49,7 @@ first_card = dbc.Card(dbc.CardBody(
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[mysql_utils.mysql_get_uni_from_id(default_uni)])])]),
         
-        dcc.Graph(id = 'pie', figure = px.pie(default_df, values='Keyword Count', names='Keyword', hole=0.25))
+        dcc.Graph(id = 'pie', figure = px.pie(default_df, values='Keyword Relevance', names='Keyword', hole=0.25))
                 
     ]),
     style={"height": "50%", "margin": "auto"}
@@ -257,7 +257,7 @@ def update_relevance_piechart(n_clicks, value):
         if value == "":
             raise PreventUpdate
         elif not res.empty:
-            return px.pie(res, values=res['Keyword Relevance'], names=res['Keyword'], hole=0.25)
+            return px.pie(res, values='Keyword Relevance', names='Keyword', hole=0.25)
         else:
             return px.pie(res, values = pd.Series(dtype='object'), names = pd.Series(dtype='object'), hole=0.25)
 
