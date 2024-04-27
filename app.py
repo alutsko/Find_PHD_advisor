@@ -10,7 +10,7 @@ import neo4j_utils
 import mongodb_utils
 
 # Setting up default dashboard display
-default_uni = 'university of illinois at urbana champaign'
+default_uni = '12'
 default_df = mysql_utils.mysql_keyword_relevance(default_uni)
 
 default_keyword = "machine learning"
@@ -22,6 +22,10 @@ default_missing_columns = [{"id": i, "name": i} for i in display_columns]
 
 mongodb = mongodb_utils.create_mongo_connection()
 
+# dropdown options for keyword and university
+keyword_options = mysql_utils.fetch_dropdown_options('keyword', 'name', 'id')
+neo4j_keyword_options = neo4j_utils.fetch_dropdown_options('keyword', 'keyword', 'name')
+university_options = mysql_utils.fetch_dropdown_options('university', 'name', 'id')
 
 # Initialize the app - incorporate a Dash Mantine theme
 external_stylesheets = [dbc.themes.BOOTSTRAP]
@@ -32,11 +36,22 @@ first_card = dbc.Card(dbc.CardBody(
     [
         dmc.Title('Find University Top Keywords', order=3),
         html.Br(),
-        html.Div(className = 'input-button-parent', 
-                 children=[html.Div(className = 'input-button-child', children = dcc.Input(id='uni_search', type='search', placeholder='Search Universities...', debounce=True)), 
-                           html.Div(className = 'input-button-child', children =html.Button('Search', id='submit_uni_search', n_clicks=0))]),
+        html.Label("Search for an institution:"),
+        dcc.Dropdown(
+            id='find_uni_kw_dropdown',
+            options=university_options,
+            placeholder="Start typing to search",
+            value=None,
+            searchable=True,
+        ),
+        html.Br(),
+        html.Button('Submit', id='submit_uni_search', n_clicks=0),
+
+        # html.Div(className = 'input-button-parent', 
+        #          children=[html.Div(className = 'input-button-child', children = dcc.Input(id='uni_search', type='search', placeholder='Search Universities...', debounce=True)), 
+        #                    html.Div(className = 'input-button-child', children =  html.Button('Search', id='submit_uni_search', n_clicks=0))]),
         html.Hr(),
-        dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[default_uni])])]),
+        dbc.Row([dbc.Col(children = [html.Div("Displaying top results for: ")]), dbc.Col(children = [html.Div(id="display_uni", children=[mysql_utils.mysql_get_uni_from_id(default_uni)])])]),
         
         dcc.Graph(id = 'pie', figure = px.pie(default_df, values='Keyword Count', names='Keyword', hole=0.25))
                 
@@ -75,9 +90,19 @@ second_card = dbc.Card(dbc.CardBody(
     [
         dmc.Title('Find Faculty Best Keywords', order=3),
         html.Br(),
-        html.Div(className = 'input-button-parent',
-                 children = [html.Div(className = 'input-button-child', children = dcc.Input(id='keyword_search', type='search', placeholder='Search Keywords...', debounce=True)), 
-                           html.Div(className = 'input-button-child', children =html.Button('Search', id='submit_kw_search', n_clicks=0))]),
+        html.Label("Select for a keyword:"),
+        dcc.Dropdown(
+            id='find_kw_fac_dropdown',
+            options=neo4j_keyword_options,
+            placeholder="Start typing to search",
+            value=None,
+            searchable=True,
+        ),
+        html.Br(),
+        html.Button('Submit', id='submit_kw_search', n_clicks=0),
+        # html.Div(className = 'input-button-parent',
+        #          children = [html.Div(className = 'input-button-child', children = dcc.Input(id='keyword_search', type='search', placeholder='Search Keywords...', debounce=True)), 
+        #                    html.Div(className = 'input-button-child', children =html.Button('Search', id='submit_kw_search', n_clicks=0))]),
         html.Hr(),
         dbc.Row([dbc.Col(children = [html.Div("Displaying top faculty for: ")]), dbc.Col(children = [html.Div(id="display_keyword", children=[default_keyword])])]),
         html.Br(),
@@ -115,6 +140,7 @@ third_card = dbc.Card(dbc.CardBody(
 fourth_card = dbc.Card(
    dbc.CardBody([
       dmc.Title('Add a new entry', order=3),
+      html.Br(),
       html.Label("I want to add a:"),
       dcc.Dropdown(
          id= 'update-dropdown', 
@@ -146,14 +172,13 @@ fourth_card = dbc.Card(
 )
 
 # 5th widget
-# dropdown options for keyword and university
-keyword_options = mysql_utils.fetch_dropdown_options('keyword', 'name', 'id')
-university_options = mysql_utils.fetch_dropdown_options('university', 'name', 'id')
 
-# card format to play nice with other widgets
+
+
 fifth_card = dbc.Card(
     dbc.CardBody([
         dmc.Title("Find publications in your research area from the university you're interested in", order=3),
+        html.Br(),
         html.Label("Select your research interest:"),
         dcc.Dropdown(
             id='keyword-dropdown',
@@ -172,17 +197,39 @@ fifth_card = dbc.Card(
         ),
         html.Br(),
         html.Button('Submit', id='submit-research-uni-button'),
-        html.Br(),
+        html.Hr(),
         html.Br(),
         dcc.Store(id='data-store', storage_type='memory'),
         html.Div(id='publication-results'),
    ]),
-   style={"height": "75%", "margin": "auto"}
+   style={"height": "50%", "margin": "auto"}
 )
+
+sixth_card = dbc.Card(
+    dbc.CardBody([
+        dmc.Title("Trending keywords by institution", order=3),
+        html.Br(),
+        html.Label("Select your research interest:"),
+        dcc.Dropdown(
+            id='trending-keyword-dropdown',
+            options=mysql_utils.fetch_dropdown_options('keyword', 'name', 'id'),
+            placeholder="Start typing to search",
+            value=None,
+            searchable=True,
+            ),
+        html.Br(),
+        html.Button('Submit', id='submit-keyword-button'),
+        html.Hr(),
+        dcc.Graph(id='bar-graph',
+            style={'height': '400px', 'width': '100%'}),
+    ]),
+   style={"height": "50%", "margin": "auto"}
+)
+
 
 app.layout = dbc.Container(
     [
-        dbc.Row([dbc.Col([first_card, fourth_card]), dbc.Col([fifth_card]), dbc.Col(second_card)]),
+        dbc.Row([dbc.Col([first_card, fourth_card]), dbc.Col([fifth_card, sixth_card]), dbc.Col(second_card)]),
         dbc.Col(third_card)
     ],
     
@@ -193,7 +240,7 @@ app.layout = dbc.Container(
 @app.callback(
     Output('display_uni', 'children'),
     Input('submit_uni_search', 'n_clicks'),
-    State('uni_search', 'value'),
+    State('find_uni_kw_dropdown', 'value'),
     prevent_initial_call = True
 )
 def display_institution_search(n_clicks, value):
@@ -201,14 +248,14 @@ def display_institution_search(n_clicks, value):
         if value == "":
             raise PreventUpdate
         elif mysql_utils.mysql_keyword_relevance(value).empty:
-            return 'no results found for '+ f'{value.lower()}'
+            return 'no results found'
         else:   
-            return f'{value.lower()}'
+            return mysql_utils.mysql_get_uni_from_id(value)
 
 @app.callback(
     Output('pie', 'figure'),
     Input('submit_uni_search', 'n_clicks'),
-    [State('uni_search', 'value')],
+    [State('find_uni_kw_dropdown', 'value')],
     prevent_initial_call = True
 )
 def update_relevance_piechart(n_clicks, value):
@@ -226,7 +273,7 @@ def update_relevance_piechart(n_clicks, value):
 @app.callback(
     Output('display_keyword', 'children'),
     Input('submit_kw_search', 'n_clicks'),
-    [State('keyword_search', 'value')],
+    [State('find_kw_fac_dropdown', 'value')],
     prevent_initial_call = True
 )
 def display_keyword_search(n_clicks, value):
@@ -234,14 +281,14 @@ def display_keyword_search(n_clicks, value):
         if value == "":
             raise PreventUpdate
         elif neo4j_utils.neo4j_faculty_keywords(value).empty:
-            return 'no results found for '+ f'{value.lower()}'
+            return 'no results found'
         else:
             return f'{value.lower()}'
 
 @app.callback(
     Output('faculty_col', 'children'),
     Input('submit_kw_search', 'n_clicks'),
-    [State('keyword_search', 'value')],
+    [State('find_kw_fac_dropdown', 'value')],
     prevent_initial_call = True
 )
 def update_faculty_output(n_clicks, value):
@@ -296,11 +343,11 @@ def update_fac_field(n_clicks, value, active_cell, fac_name_value, data):
         "PhotoURL": "photoUrl"
     }
     database_df = pd.DataFrame(data)
-    
+
     if n_clicks > 0:
-        if value == None or value == "":
+        if value == None or value == "" or active_cell['column_id'] == 'Name':
             raise PreventUpdate
-        else:
+        elif column_name_dict[active_cell['column_id']] != 'name':
             neo4j_utils.neo4j_update_faculty_field(database_df.at[active_cell['row'], 'fac_id'], column_name_dict[active_cell['column_id']], value)
             results = neo4j_utils.neo4j_find_faculty(fac_name_value)
             res_dict = results[['fac_id', 'Name', 'Institution', 'Position', 'Email', 'Phone', 'PhotoURL']].to_dict('records')
@@ -308,12 +355,14 @@ def update_fac_field(n_clicks, value, active_cell, fac_name_value, data):
             update_message = "***Updated " + str(column_name_dict[active_cell['column_id']]) + " with " + str(value) +  "***"
 
             return [res_dict, columns, update_message]
-
+       
 # Widget 4
 # callback to generate input fields based on selection from dropdown
 @app.callback(
    Output('input-fields-container', 'children'),
-   [Input('update-dropdown', 'value')]
+   [Input('update-dropdown', 'value')],
+   prevent_initial_call = True
+
 )
 def generate_input_fields(option):
    if option == 'faculty':
@@ -380,7 +429,8 @@ def generate_input_fields(option):
    Output('notification-toast', 'is_open'),
    Input('submit-fac-pub', 'n_clicks'),
    [State('update-dropdown', 'value'),
-    State('input-fields-container', 'children')]
+    State('input-fields-container', 'children')],
+    prevent_initial_call = True
 )
 def capture_and_update(n_clicks, option, input_fields):
    if n_clicks is not None and option is not None and input_fields is not None:
@@ -407,7 +457,8 @@ def capture_and_update(n_clicks, option, input_fields):
     Output('data-store', 'data'),
     Input('submit-research-uni-button', 'n_clicks'),
     State('keyword-dropdown', 'value'),
-    State('university-dropdown', 'value')
+    State('university-dropdown', 'value'),
+    prevent_initial_call = True
 )
 def capture_user_selections(n_clicks, keyword_id, university_id):
     if n_clicks and keyword_id and university_id:
@@ -419,7 +470,8 @@ def capture_user_selections(n_clicks, keyword_id, university_id):
 # callback to get data from stored procedure and joins
 @app.callback(
     Output('publication-results', 'children'),
-    Input('data-store', 'data')
+    Input('data-store', 'data'),
+    prevent_initial_call = True
 )
 def process_user_selections(data):
     if data:
@@ -427,7 +479,7 @@ def process_user_selections(data):
         keyword_id = data.get('keyword_id')
         university_id = data.get('university_id')
         res = mysql_utils.GetPublicationsByKeywordAndUniversity(keyword_id, university_id)
-        
+
         # creating table of results
         if not res.empty:
             table = dash_table.DataTable(
@@ -447,6 +499,45 @@ def process_user_selections(data):
                 html.H6("This institution has not been involved in any publications on this research topic"),
             ])
    
+# Widget 6
+# callback to capture user selections
+@app.callback(
+    Output('bar-graph', 'figure'),
+    Input('submit-keyword-button', 'n_clicks'),
+    State('trending-keyword-dropdown', 'value'),
+    prevent_initial_call = True
+)
+def update_bar_graph(n_clicks, keyword_id):
+    if n_clicks and keyword_id:    
+        res = mysql_utils.GetTopUniversitiesByYear(keyword_id)
+        if not res.empty:
+            fig = px.bar(res, 
+                         x='year', 
+                         y='num_pubs', 
+                         color='universityName', 
+                         text='universityName',
+                         hover_data={'universityName': True, 'num_pubs': True, 'year': False},
+                         color_discrete_sequence=px.colors.qualitative.Pastel2,
+                         )
+            
+            fig.update_layout(xaxis_title='Year', 
+                              yaxis_title='Number of Publications',
+                              title='Number of Publications by University', 
+                              showlegend=False,
+                              uniformtext_minsize=1,
+                              uniformtext_mode='hide',
+                              bargap=0.1,
+                              barmode='stack', 
+                              )
+            fig.update_traces(hovertemplate='University: %{text}<br>Number of Publications: %{y}<extra></extra>')
+            
+            return fig
+        else:
+            return html.Div([
+                html.Br(),
+                html.H6("This institution has not been involved in any publications on this research topic"),
+            ])
+        
 # Run the App
 if __name__ == '__main__':
     app.run(debug=True)

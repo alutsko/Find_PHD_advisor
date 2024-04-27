@@ -8,6 +8,17 @@ def connect_to_neo4j():
     driver =  GraphDatabase.driver(URI, auth=AUTH)
     return driver
 
+# get dropdown options
+def fetch_dropdown_options(table_name, node, node_attribute):
+    driver =  connect_to_neo4j()
+    
+    neo4j_query_res = driver.execute_query(
+        "MATCH (" + node + ":" + table_name.upper() + ") RETURN DISTINCT " + node + "." + node_attribute + " ORDER BY " + node + "." + node_attribute + " ASC",
+        database_="academicworld", 
+        result_transformer_= neo4j.Result.to_df
+        )
+    return list(neo4j_query_res[node + '.' + node_attribute])
+
 def neo4j_faculty_keywords(keyword):
     driver =  connect_to_neo4j()
 
