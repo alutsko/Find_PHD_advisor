@@ -51,19 +51,21 @@ in the specific fields/keywords students are interested in, what schools they ar
 Helen:
 
 1. Tasks done:
-   Widgets - Find University Top Keywords, Find Faculty Best Keywords, Fix Missing Faculty Fields
-   Techniques - Indexing
-   Databases used - MySQL and Neo4j
-   Misc. - project outline/plan, widget brainstorming, README file, widget integration, video editing
+
+   - Widgets - Find University Top Keywords, Find Faculty Best Keywords, Fix Missing Faculty Fields
+   - Techniques - Indexing
+   - Databases used - MySQL and Neo4j
+   - Misc. - project outline/plan, widget brainstorming, README file, widget integration, video editing
 
 2. Estimated time spent: 35 hours
 
 Amber:
 
 1. Tasks done:
-   Widgets - Add New Faculty Members, Top Publications in Research Interest, Trending Research by Institution
-   Techniques - Views, Stored Procedures
-   Databases used - MySQL and MongoDB
-   Misc. - project outline/plan population, contributed to README file, widget brainstorming
+
+   - Widgets - Add New Faculty Members, Top Publications in Research Interest, Trending Research by Institution
+   - Techniques - Views, Stored Procedures
+   - Databases used - MySQL and MongoDB
+   - Misc. - project outline/plan population, contributed to README file, widget brainstorming
 
 2. Estimated time spent: 35 hours
