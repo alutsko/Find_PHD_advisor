@@ -61,3 +61,9 @@ Amber:
    Misc. - project outline/plan population, contributed to README file, widget brainstorming
 
 2. Estimated time spent: 30 hours
+
+**IMPORTANT NOTES:**
+
+1. Please make sure you dash mantine components package is version 0.12.1
+2. Please have Neo4j academicworld database running when running app.py
+3. Please make sure to run the SQL files in the MySQL database before running app.py

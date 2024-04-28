@@ -200,7 +200,7 @@ fifth_card = dbc.Card(
 
 sixth_card = dbc.Card(
     dbc.CardBody([
-        dmc.Title("Trending keywords by institution", order=3),
+        dmc.Title("Trending research by institution", order=3),
         html.Br(),
         html.Label("Select your research interest:"),
         dcc.Dropdown(
@@ -506,10 +506,10 @@ def update_bar_graph(n_clicks, keyword_id):
         if not res.empty:
             fig = px.bar(res, 
                          x='year', 
-                         y='num_pubs', 
-                         color='universityName', 
-                         text='universityName',
-                         hover_data={'universityName': True, 'num_pubs': True, 'year': False},
+                         y='num_publications', 
+                         color='name', 
+                         text='name',
+                         hover_data={'name': True, 'num_publications': True, 'year': False},
                          color_discrete_sequence=px.colors.qualitative.Pastel2,
                          )
             
@@ -517,10 +517,9 @@ def update_bar_graph(n_clicks, keyword_id):
                               yaxis_title='Number of Publications',
                               title='Number of Publications by University', 
                               showlegend=False,
-                              uniformtext_minsize=1,
                               uniformtext_mode='hide',
-                              bargap=0.1,
                               barmode='stack', 
+                              margin=dict(l=15, r=1, t=50, b=50),
                               )
             fig.update_traces(hovertemplate='University: %{text}<br>Number of Publications: %{y}<extra></extra>')
             

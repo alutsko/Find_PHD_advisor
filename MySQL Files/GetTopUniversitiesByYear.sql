@@ -8,8 +8,8 @@ SET keywordIdVar = keywordId;
 
 WITH RankedUniversities AS (
     SELECT
-        FacUniViewAbr.universityName as universityName,
-        COUNT(DISTINCT pub_w_year.publication_id) AS num_pubs,
+        FacUniViewAbr.universityName as name,
+        COUNT(DISTINCT pub_w_year.publication_id) AS num_publications,
         MAX(pub_w_year.year) AS year,
         ROW_NUMBER() OVER(PARTITION BY MAX(pub_w_year.year) ORDER BY COUNT(DISTINCT pub_w_year.publication_id) DESC) AS row_num
     FROM
@@ -34,10 +34,10 @@ WITH RankedUniversities AS (
     ON FacUniViewAbr.facultyID = pub_w_year.faculty_id
     GROUP BY FacUniViewAbr.universityName
 )
-SELECT universityName, num_pubs, year
+SELECT name, num_publications, year
 FROM RankedUniversities
 WHERE row_num <= 10
-ORDER BY year, num_pubs DESC;
+ORDER BY year, num_publications DESC;
 
 END //
 
