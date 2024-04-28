@@ -165,9 +165,6 @@ fourth_card = dbc.Card(
 )
 
 # 5th widget
-
-
-
 fifth_card = dbc.Card(
     dbc.CardBody([
         dmc.Title("Find publications in your research area from the university you're interested in", order=3),
@@ -512,7 +509,6 @@ def update_bar_graph(n_clicks, keyword_id):
                          hover_data={'name': True, 'num_publications': True, 'year': False},
                          color_discrete_sequence=px.colors.qualitative.Pastel2,
                          )
-            
             fig.update_layout(xaxis_title='Year', 
                               yaxis_title='Number of Publications',
                               title='Number of Publications by University', 
