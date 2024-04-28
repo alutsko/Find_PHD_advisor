@@ -54,7 +54,7 @@ Helen:
    Widgets - Find University Top Keywords, Find Faculty Best Keywords, Fix Missing Faculty Fields
    Techniques - Indexing
    Databases used - MySQL and Neo4j
-   Misc. - project outline/plan, widget brainstorming, README file, widget integration
+   Misc. - project outline/plan, widget brainstorming, README file, widget integration, video editing
 
 2. Estimated time spent: 35 hours
 
