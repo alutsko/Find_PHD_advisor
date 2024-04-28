@@ -5,7 +5,7 @@
 **Purpose:** Helps future PhD students find their ideal PhD supervisor by giving them an idea of who are prominent figures
 in the specific fields/keywords students are interested in, what schools they are from, which universities specialize in which fields.
 
-**Demo:** //TODO: Give the link to your video demo.
+**Demo:** https://mediaspace.illinois.edu/media/t/1_z8arl9yt
 
 **Installation:** Please run the following MySQL commands in the academicworld database:
 
@@ -13,6 +13,12 @@ in the specific fields/keywords students are interested in, what schools they ar
 2. Run the contents in the provided GetPublicationsByKeywordAndUniversity.sql file - this will create a stored procedure referencing the aforementioned view
 3. Run the contents in the provided FacUniViewAbr.sql file - this will create a view later referenced
 4. Run the contents in the provided GetTopUniversitiesByYear.sql file - this will create a stored procedure referencing the aforementioned view
+
+**IMPORTANT NOTES:**
+
+1. Please make sure you dash mantine components package is version 0.12.1
+2. Please have Neo4j academicworld database running when running app.py
+3. Please make sure to run the SQL files in the MySQL database before running app.py
 
 **Usage by widget:**
 
@@ -50,7 +56,7 @@ Helen:
    Databases used - MySQL and Neo4j
    Misc. - project outline/plan, widget brainstorming, README file, widget integration
 
-2. Estimated time spent: 30 hours
+2. Estimated time spent: 35 hours
 
 Amber:
 
@@ -60,10 +66,4 @@ Amber:
    Databases used - MySQL and MongoDB
    Misc. - project outline/plan population, contributed to README file, widget brainstorming
 
-2. Estimated time spent: 30 hours
-
-**IMPORTANT NOTES:**
-
-1. Please make sure you dash mantine components package is version 0.12.1
-2. Please have Neo4j academicworld database running when running app.py
-3. Please make sure to run the SQL files in the MySQL database before running app.py
+2. Estimated time spent: 35 hours
