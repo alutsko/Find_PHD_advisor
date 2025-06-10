@@ -1,3 +1,9 @@
+## Credits
+
+This project was completed collaboratively with Helen Cao as part of CS 411 Database Systems at University of Illinois Urbana-Champaign.
+
+Codebase represents shared contributions and is published here with permission.
+
 # Amber_Helen
 
 **Title:** Find Your Ideal PhD Supervisor
